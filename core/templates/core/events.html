@@ -1,0 +1,264 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Мероприятия{% endblock %}
+
+{% block content %}
+{% load mathfilters %}
+{% load crispy_forms_tags %}
+
+
+<div class="container mt-4 " id='imglist'>
+    <div class="card">
+        <div class="card-header d-flex justify-content-between">
+          <div>
+            Мероприятия
+          </div>
+          
+        </div>
+
+        <div class="card-body ">
+            <div class="container">
+              <form id="form_add" class="add-form" data-db="records" method="POST">
+                <div class="container modal-body d-flex flex-column">
+                    {% csrf_token %} 
+                    <div class="row d-flex justify-content-between">
+                        <div class="col-sm">
+                            <div class="input-group">
+                                <input id="events" name="events" type="search" class="form-control rounded-left" placeholder="Search" aria-label="Search"
+                                    aria-describedby="search-addon" value="{{qsname}}"/>
+                                <button type="submit" class="btn btn-dark rounded-right">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                                <a id="diagn_btn" href="" data-toggle="modal" data-target="#add_event" type="button" href="{% url 'login' %}" class="btn ml-2 btn-light d-flex justify-content-center align-items-center p-0 shadow-none" style="color: #4e4c55;">
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="currentColor" class="bi bi-plus-square" viewBox="0 0 16 16">
+                                    <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
+                                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                                  </svg>
+                                </a>
+                            </div>
+                        </div>
+                          
+                    </div>
+                </div>
+              </form>
+            </div>
+            
+            
+          </div>
+            {% if events %}
+            <div class="container table-responsive">
+              <div class="container ">
+              <table id="events_table" class="table table-bordered table-striped flex-auto " cellspacing="0">
+                <thead>
+                  <tr>
+                    <th>Название</th>
+                    <th>Начало</th>
+                    <th>Конец</th>
+                    <th>Адрес</th>
+                    <th>Тип</th>
+                    <th>Действие</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for event in events %}
+                  <tr>
+                    <td>
+                      <div class="" >{{ event.name }}</div>
+                    </td>
+                    <td>
+                      <div class="" >{{ event.startDate|date:'d.m.Y H:i:s' }}</div>
+                    </td>
+                    <td>
+                      <div class="" >{{ event.endDate|date:'d.m.Y H:i:s' }}</div>
+                    </td>
+                    <td>
+                      <div class="" >{{ event.address }}</div>
+                    </td>
+                    <td>
+                      <div class="" >{{ event.type }}</div>
+                    </td>
+                    <td class="td-actions text-center ">
+                      <button id="del" value="{% url 'event_delete' event.id %}" class="btn text-black btn-just-icon btn-sm delete mr-2 delete shadow-none">
+                          <i class="material-icons">delete</i>
+                      </button>
+                      <a class="btn text-black btn-just-icon btn-sm shadow-none"
+                          href="{% url 'event' event.id %}?page={{events.number}}{% if qsname %}&qsname={{qsname}}{%endif%}">
+                          <i class="material-icons">edit</i>
+                      </a>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+              </div>
+              </div>
+              <div class="container">
+                <!--Pagination-->
+                <nav aria-label="Page navigation background" class="bg-light rounded">
+                  <ul class="pagination justify-content-center align-self-center">
+                    {% if events.has_previous %}
+                      <li class="page-item">
+                        <a class="page-link" href="?page={{ events.previous_page_number }}{% if qsname %}&qsname={{qsname}}{%endif%}">Предыдущий</a>
+                      </li>
+                      {% if minp != mina %}
+                          <li class="page-item">
+                            <a class="page-link" href="?page={{ mina }}{% if qsname %}&qsname={{qsname}}{%endif%}">
+                              {{ mina }}
+                            </a>
+                          </li>
+                        {% if events.number|sub:mina > 3 %}
+                          <li class="page-item">
+                          <p class="page-link">
+                            ...
+                          </p>
+                          </li>
+                        {% endif %}
+                      {% endif %}
+                    {% else %}
+                      <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1" aria-disabled="True">Предыдущий</a>
+                      </li>
+                    {% endif %}
+
+
+                    {% for i in events.paginator.page_range %}
+                      {% if  i < events.number%}
+                        {% if i >= minp %}
+                          <li class="page-item">
+                          <a class="page-link" href="?page={{ i }}{% if qsname %}&qsname={{qsname}}{%endif%}">
+                            {{ i }}
+                          </a>
+                        </li>
+                        {% endif %}
+                      {% elif i == events.number %}
+                        <li class="page-item active " aria-current="page">
+                          <span class="page-link bg-dark">
+                            {{ i }}
+                            <span class="sr-only">(current)</span>
+                          </span>
+                        </li>
+                      {% else %}
+                        {% if i <= maxp %}
+                          <li class="page-item">
+                          <a class="page-link" href="?page={{ i }}{% if qsname %}&qsname={{qsname}}{%endif%}">
+                            {{ i }}
+                          </a>
+                          </li>
+                        {% endif %}
+                      {% endif %}
+                    {% endfor %}
+
+                    
+                    {% if events.has_next %}
+                      
+                      {% if maxp != maxa %}
+                          
+                        {% if maxa|sub:events.number > 3 %}
+                          <li class="page-item">
+                          <p class="page-link">
+                            ...
+                          </p>
+                          </li>
+                        {% endif %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ maxa }}{% if qsname %}&qsname={{qsname}}{%endif%}">
+                              {{ maxa }}
+                            </a>
+                          </li>
+                      {% endif %}
+                      <li class="page-item">
+                        <a class="page-link" href="?page={{ events.next_page_number }}{% if qsname %}&qsname={{qsname}}{%endif%}">Следующий</a>
+                      </li>
+                    {% else %}
+                      <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1" aria-disabled="True">Следующий</a>
+                      </li>
+                    {% endif %}
+                  </ul>
+                </nav>
+                <!--end of Pagination-->
+              </div>
+            
+            {% else %}
+            <div class="text-center text-black mb-2">
+                <h5>Нет мероприятий.</h5>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+    <form id="form_event" class="add-form" data-db="records" method="POST">
+        <div id="add_event" class="modal" tabindex="0" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Создать мероприятие</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body container d-flex flex-column">
+                        {% csrf_token %} 
+                        {{ form}}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-dark" data-dismiss="modal">Отмена</button>
+                        <button type="submit" class="btn btn-outline-dark" name="createDi">Создать</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+<script>
+  $( function() {
+    $( "#events" ).autocomplete({
+      source: "{% url 'events'%}"
+    });
+  } );
+
+   $(document).ready(function() {
+
+    // Удаление элемента из таблицы
+    $(document).delegate('#del', 'click', function() {
+          var button = document.querySelector("#del");
+          var idorder = String(button.value)
+          var isOK = confirm("Вы уверены, что хотите удалить мероприятие?");
+          if(isOK){
+            window.location.href=""+idorder
+          }
+      });
+  });
+
+</script>
+
+
+    <script>
+
+       
+    </script>
+
+<style>
+       .ui-autocomplete {
+            max-height: 200px;
+            overflow-y: auto;
+            /* prevent horizontal scrollbar */
+            overflow-x: hidden;
+            /* add padding to account for vertical scrollbar */
+            padding-right: 20px;
+        } 
+
+        body.modal-open {
+            overflow: auto;
+        }
+
+        body.modal-open[style] {
+            padding-right: 0px !important;
+        }
+
+        .modal::-webkit-scrollbar {
+            width: 0 !important;
+        }
+</style>
+{% endblock %}

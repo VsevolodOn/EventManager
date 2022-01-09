@@ -1,0 +1,41 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Личный кабинет{% endblock %}
+
+{% block content %}
+    <div class="d-flex justify-content-center mt-5">
+        <div class="col-md-7 mb-1 mt-1 text-black text-center ">
+            <div class="container ">
+                <h1 class="jumbotron-heading font-weight-bold">Личный кабинет</h1>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mt-3">
+
+        <div class="card shadow-sm">
+            {% if message %}
+                <div class="container  justify-content-center mt-2 mb-2">
+                    <div class="card text-center text-dark text-bold">
+                        <h5>
+                            {{ message }}
+                        </h5>
+                    </div>     
+                </div>
+            {% endif %}
+            <div class="card-body mr-3">
+                
+                <h4 class="card-title">{{ user }}</h4>
+
+                <p id="name_FIO" class="card-text text-dark mx-2 border-bottom container">Имя: {{ user.first_name }}</p>
+                <p id="name_email" class="card-text text-dark mx-2 border-bottom container">Почта: {{ user.email }}</p>
+                <form  method="POST" action="{% url 'logout' %}">
+                  {% csrf_token %}
+                  <button id="signOutBtn" class="btn-outline-dark rounded btn-xs ml-2 pull-right" type="submit">Выход</button>
+                </form>
+                
+            </div>
+        </div>
+    </div>  
+     
+{% endblock %}

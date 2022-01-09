@@ -1,0 +1,41 @@
+{% extends 'core/base.html' %} {% block title %}Вход{% endblock %} 
+{% load crispy_forms_tags %}
+{% block content %}
+    <div class="row justify-content-center mt-2 mb-2 ">
+        <div class="col-md-4 card shadow-sm mb-1 bg-white rounded mt-5">
+          <div class="card-header mb-2">
+            <h4 class="my-0 font-weight-normal text-center">Электронный менеджер мероприятий</h4>
+          </div>
+          <div class="card-body p-0">
+            {%if mes %}
+            <div class="alert alert-block alert-error"> <ul> <li>{{mes}}</li> </ul> </div>
+            {% endif %}
+            <form method="POST">
+              {% csrf_token %}
+              <div class="row justify-content-center mt-2 mb-3">
+                <div class="col-7 d-flex justify-content-center flex-column">
+                  <form id ="log_id" class="d-flex flex-column"> 
+                    {{ form|crispy }}
+                    <div class="container mt-3 m-0 pl-3 pr-3">
+                      <div class="row p-0 ">
+                        <button type="submit" class="mb-1 btn btn btn-outline-dark btn-sm text-center"><strong>Вход</strong></button>
+                      </div>
+                      <div class="row p-0 ">
+                        <a class="text-dark text-center" href="{% url 'signup' %}"><small>Регистрация</small></a>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div> 
+            </form>
+          </div>
+        </div>
+    </div>
+
+<style>
+  input, select {
+    width:100%;
+    }
+</style>
+
+{% endblock %}

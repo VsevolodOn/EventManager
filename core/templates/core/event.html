@@ -1,0 +1,349 @@
+
+{% extends 'core/base.html' %}
+{% load crispy_forms_tags %}
+{% load static %} 
+
+{% block title %}Мероприятие{% endblock %}
+{% block content %}
+{% load mathfilters %}
+{% load crispy_forms_tags %}
+
+<a type="button" rel="tooltip" href="{% url 'events' %}{% if urargs %}?{{urargs}}{%endif%}" class="ml-3 mt-2 h5 text-black" data-original-title="" title="">&#8592; назад (Мероприятия)</a>
+
+<!-- Данные описания протокола -->
+<div class="container mt-3">
+    <div class="card">
+        <div id="dataprog" class="card-header d-flex justify-content-between">
+          <div>
+            {{event.name}}
+          </div>
+          <div>
+            {{event.startDate|date:'d.m.Y H:i:s'}} - {{event.endDate|date:'d.m.Y H:i:s'}}
+          </div>
+          </div>
+        <div class="card-body ">
+            <div class="container">
+                <p class="card-text mb-auto">
+                    <span class="font-weight-bold">Адрес:</span> 
+                    {{event.address}}</p>
+                <p class="card-text mb-auto">
+                    <span class="font-weight-bold">Тип мероприятия:</span> 
+                    {{event.type.name}}</p>
+                {% if event.description%}
+                <p class="card-text mb-auto">
+                    <span class="font-weight-bold">Описание:</span>     
+                    {{event.description}}</p>    
+                 {% endif %}
+                <div class="row justify-content-start mt-2">
+                    <div class="col-2">
+                        <a id="chagne_btn" href="" data-toggle="modal" data-target="#chagne_event"
+                        class="btn btn-outline-dark btn-xs pull-left add-elem">Изменить
+                        </a>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Окно изменения данных протокола -->
+<form id="form_event" class="add-form" data-db="records" method="POST">
+    <div id="chagne_event" class="modal" tabindex="0" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Данные мероприятия</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body container d-flex flex-column">
+                    {% csrf_token %}
+                    {{ eform }}    
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-dark" data-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-outline-dark" name="createDi">Изменить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+
+
+<div id='list-visitors' class="container mt-4 " id='imglist'>
+    <div class="card">
+        <div class="card-header d-flex justify-content-between">
+          <div>
+            Участники
+          </div>
+        </div>
+
+        <div class="card-body ">
+
+          <form id="form_visitor" class="add-form" method="POST">
+            <div class="container d-flex flex-column">
+                {% csrf_token %} 
+                {{ vform }}
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-outline-dark" name="createDi">Добавить</button>
+            </div>
+          </form>
+
+
+            {% if visitors %}
+            <div class="container table-responsive">
+              <div class="container ">
+              <table id="events_table" class="table table-bordered table-striped flex-auto " cellspacing="0">
+                <thead>
+                  <tr>
+                    <th>Дата прибытия</th>
+                    <th>Имя</th>
+                    <th>Тип участника</th>
+                    <th>Удаление</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for visitor in visitors %}
+                  <tr>
+                    <td>
+                      <div class="" >{{ visitor.arrivalDate|date:'d.m.Y H:i:s' }}</div>
+                    </td>
+                    <td>
+                      <div class="" >{{ visitor.fullName }}</div>
+                    </td>
+                    <td>
+                      <div class="" >{{ visitor.type }}</div>
+                    </td>
+                    <td class="td-actions text-center ">
+                      <button id="del" value="{% url 'visitor_delete' visitor.id %}{% if urargs %}?{{urargs}}{%endif%}" class="btn text-black btn-just-icon btn-sm delete mr-2 delete shadow-none">
+                          <i class="material-icons">delete</i>
+                      </button>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+              </div>
+              </div>
+              <div class="container">
+                <!--Pagination-->
+                <nav aria-label="Page navigation background" class="bg-light rounded">
+                  <ul class="pagination justify-content-center align-self-center">
+                    {% if visitors.has_previous %}
+                      <li class="page-item">
+                        <a class="page-link" href="?vpage={{ visitors.previous_page_number }}{% if urargs %}&{{urargs}}{%endif%}#events_table">Предыдущий</a>
+                      </li>
+                      {% if minp != mina %}
+                          <li class="page-item">
+                            <a class="page-link" href="?vpage={{ mina }}{% if urargs %}&{{urargs}}{%endif%}#events_table">
+                              {{ mina }}
+                            </a>
+                          </li>
+                        {% if visitors.number|sub:mina > 3 %}
+                          <li class="page-item">
+                          <p class="page-link">
+                            ...
+                          </p>
+                          </li>
+                        {% endif %}
+                      {% endif %}
+                    {% else %}
+                      <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1" aria-disabled="True">Предыдущий</a>
+                      </li>
+                    {% endif %}
+
+
+                    {% for i in visitors.paginator.page_range %}
+                      {% if  i < visitors.number%}
+                        {% if i >= minp %}
+                          <li class="page-item">
+                          <a class="page-link" href="?vpage={{ i }}{% if urargs %}&{{urargs}}{%endif%}#events_table">
+                            {{ i }}
+                          </a>
+                        </li>
+                        {% endif %}
+                      {% elif i == visitors.number %}
+                        <li class="page-item active " aria-current="page">
+                          <span class="page-link bg-dark">
+                            {{ i }}
+                            <span class="sr-only">(current)</span>
+                          </span>
+                        </li>
+                      {% else %}
+                        {% if i <= maxp %}
+                          <li class="page-item">
+                          <a class="page-link" href="?vpage={{ i }}{% if urargs %}&{{urargs}}{%endif%}#events_table">
+                            {{ i }}
+                          </a>
+                          </li>
+                        {% endif %}
+                      {% endif %}
+                    {% endfor %}
+
+                    
+                    {% if visitors.has_next %}
+                      
+                      {% if maxp != maxa %}
+                          
+                        {% if maxa|sub:visitors.number > 3 %}
+                          <li class="page-item">
+                          <p class="page-link">
+                            ...
+                          </p>
+                          </li>
+                        {% endif %}
+                        <li class="page-item">
+                            <a class="page-link" href="?vpage={{ maxa }}{% if urargs %}&{{urargs}}{%endif%}#events_table">
+                              {{ maxa }}
+                            </a>
+                          </li>
+                      {% endif %}
+                      <li class="page-item">
+                        <a class="page-link" href="?vpage={{ visitors.next_page_number }}{% if urargs %}&{{urargs}}{%endif%}#events_table">Следующий</a>
+                      </li>
+                    {% else %}
+                      <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1" aria-disabled="True">Следующий</a>
+                      </li>
+                    {% endif %}
+                  </ul>
+                </nav>
+                <!--end of Pagination-->
+              </div>
+            
+            {% else %}
+            <div class="text-center text-black">
+                <h5 class="">Нет участников.</h5>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+    
+
+
+<!-- Аналитика -->
+<div class="container mt-3">
+    <div class="card">
+        <div id="dataprog" class="card-header ">
+          <div>
+            Аналитика
+          </div>
+          </div>
+        <div class="card-body ">
+            <div class="container">
+              <ul class="list-unstyled">
+                <li>
+                    <p class="card-text mb-auto">
+                    <span class="font-weight-bold">Всего участников:</span> 
+                    {{acount}}</p>
+                </li>
+                    {% if acount != 0 %}
+                    <li>
+                      <p class="card-text mb-auto">
+                        <span class="font-weight-bold">Число участников по типу:</span>
+                      </p>
+                    </li>
+                      <ul>
+                      {% for vcount in vcounts %}
+                        <li><p class="card-text mb-auto">
+                          <span class="font-weight-bold">{{vcount.type__name}}:</span> {{vcount.dcount}}
+                        </p></li>
+                      {% endfor %}
+                      </ul>
+                    {% endif %}
+                <li>
+                    <p class="card-text mb-auto">
+                    <span class="font-weight-bold">Минимальное время:</span> 
+                    {{mindata.arrivalDate__min| date:'d.m.Y H:i:s' }}</p>
+                </li>
+                <li>
+                    <p class="card-text mb-auto">
+                    <span class="font-weight-bold">Максимальное время:</span> 
+                    {{maxdata.arrivalDate__max | date:'d.m.Y H:i:s' }}</p>
+                </li>
+                <li>
+                    <p class="card-text mb-auto">
+                    <span class="font-weight-bold">Среднее время:</span> 
+                    {{meandata | date:'d.m.Y H:i:s'}}</p>
+                </li>
+                <li>
+                    <p class="card-text mb-auto">
+                    <span class="font-weight-bold">Квартиль 1 (время):</span> 
+                    {{q1data | date:'d.m.Y H:i:s'}}</p>
+                </li>
+                <li>
+                    <p class="card-text mb-auto">
+                    <span class="font-weight-bold">Медиана (время):</span> 
+                    {{mediandata | date:'d.m.Y H:i:s'}}</p>
+                </li>
+                <li>
+                    <p class="card-text mb-auto">
+                    <span class="font-weight-bold">Квартиль 3 (время):</span> 
+                    {{q3data | date:'d.m.Y H:i:s'}}</p>
+                </li>
+
+                
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+  // $(window).scroll(function() { animatable.stop(); });
+
+   $(document).ready(function() {
+
+    // Удаление элемента из таблицы
+    $(document).delegate('#del', 'click', function() {
+          var button = document.querySelector("#del");
+          var idorder = String(button.value)
+          var isOK = confirm("Вы уверены, что хотите удалить запись?");
+          if(isOK){
+            window.location.href=""+idorder
+          }
+    });
+  });
+
+</script>
+
+<style>
+        
+      html {
+        scroll-behavior: unset; 
+      }
+
+
+       .ui-autocomplete {
+            max-height: 200px;
+            overflow-y: auto;
+            /* prevent horizontal scrollbar */
+            overflow-x: hidden;
+            /* add padding to account for vertical scrollbar */
+            padding-right: 20px;
+        } 
+
+        body.modal-open {
+            overflow: auto;
+        }
+
+        body.modal-open[style] {
+            padding-right: 0px !important;
+        }
+
+        .modal::-webkit-scrollbar {
+            width: 0 !important;
+        }
+</style>
+
+{% endblock %}
