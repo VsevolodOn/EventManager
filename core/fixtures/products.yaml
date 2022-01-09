@@ -1,0 +1,4 @@
+- model: shop.TypeEvent
+  pk: 1
+  fields:
+    name: Тип 1

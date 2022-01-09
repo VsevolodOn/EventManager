@@ -1,0 +1,18 @@
+language: python
+python:
+- 3.8
+services:
+- postgresql
+install:
+- psql -c 'create database djmanager owner postgres;' -U postgres
+- pip install -r requirements.txt
+script:
+- python manage.py migrate
+- python manage.py test core/tests/
+deploy:
+  provider: heroku
+  api_key:
+    secure: p/fEeU5EGAbsYlagKnqhqPvsxdBph5cedt19+d8xIYJ2ZgI4bNyuhY1spaRLu4H30VwE13pZebIUgTHCovgEsftTee9Cq8Ns04IGU7KVuEgTz6yTDlFexM0p9rdNDzgUv7QpVL7nFW9QVX/iW9qHYLB3JZOnyFaejOszZh1WEiWuxz5NawFg69FQfdHIrMeDyb7wy3DMI7GK5/bOPCVjIo0XPd1wPSwWcr6pNffzzkyqKYWCtm9pWbC5KnK7IlfF+ltK29Cf1wQRETJy/oBRzBiMPhPEQPUD8Q7F7wYkwqpkJG/U82oP+YG2uO0s9pUjC3KdsdbICpA9Bdlsb46kfSc1gXx3Uzr7ABzs3/plMigJ7J10aztOQRlkybP+m0j7tmqCE96G9MrL+WtdUA7yvOjy6TZkopLjXtzcjF/ytG4C/P3tlsJfzjrt0vpJqViVb6EoYDNZFBh+AosPj+EL4AvOxlrII4sT+G7K6eZmY4eE+e9mDTHqsICb/w1vXdqEB6INGiTjhEcgYNDQN0OncMYYOlQVgoeAP3o3ManrOhurqOnRvCMfC2hwYJy82f1Koz7hu9/KKKJbJCbCPWZkwTW+yXGC98qEmDEBwdE34PgWGt/YylYiH9bpuMkmT24djL51tYd6xWN7AOKSxmI8pLA+63RKKBIzwgg3Tp2GsqA=
+  app: eventmanagervsevo
+  run:  python manage.py migrate && python manage.py loaddata products.yaml
+  on: master
