@@ -61,7 +61,7 @@
                 </div>
                 <div class="modal-body container d-flex flex-column">
                     {% csrf_token %}
-                    {{ eform }}    
+                    {{ eform|crispy }}    
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-dark" data-dismiss="modal">Отмена</button>
@@ -87,7 +87,7 @@
           <form id="form_visitor" class="add-form" method="POST">
             <div class="d-flex flex-column">
                 {% csrf_token %} 
-                {{ vform }}
+                {{ vform|crispy }}
             </div>
             <div class="modal-footer">
                 <button type="submit" class="btn btn-outline-dark" name="createDi">Добавить</button>

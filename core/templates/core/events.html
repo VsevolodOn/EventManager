@@ -200,7 +200,7 @@
                     </div>
                     <div class="modal-body container d-flex flex-column">
                         {% csrf_token %} 
-                        {{ form}}
+                        {{ form|crispy}}
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-outline-dark" data-dismiss="modal">Отмена</button>

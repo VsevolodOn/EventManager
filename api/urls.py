@@ -6,12 +6,11 @@ from . import views
 urlpatterns = [
     path('signup', views.signup),
     path('login', views.login),
+    path('logout', views.LogoutView.as_view()),
+    path('analysis/<int:pk>', views.AnalysisView.as_view()),
 
-    # path('performance', views.PerformanceList.as_view()),
-    # path('performance/create', views.PerformanceCreate.as_view()),
-    # path('performance/<int:pk>', views.PerformanceRetrieveUpdateDestroy.as_view()),
-
-    # path('order', views.OrderListCreate.as_view(), name="listcreateorder"),
-    # path('order/<int:pk>', views.OrderRetrieveUpdateDestroy.as_view(),
-    #      name='retrieveorder'),
+    path('event', views.EventListCreate.as_view()),
+    path('event/<int:pk>', views.EventRetrieveUpdateDestroy.as_view()),
+    path('event/<int:pk>/visitor', views.VisitorListCreate.as_view()),
+    path('visitor/<int:pk>', views.VisitorRetrieveUpdateDestroy.as_view()),
 ]
