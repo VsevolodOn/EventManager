@@ -72,8 +72,20 @@ def login(request):
         return JsonResponse({'error': 'Разрешен только метод POST.'})
 
 
-class LogoutView(APIView):
+class UserUpdateView(generics.UpdateAPIView):
+    serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return User.objects.filter(id=self.kwargs['pk'])
+
+
+class UserView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        user = self.request.user
+        return Response({"id": user.id, "login": user.username, "fio": user.first_name, "email": user.password})
 
     def delete(self, request):
         self.request.user.auth_token.delete()

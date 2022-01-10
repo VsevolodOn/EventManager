@@ -1,3 +1,4 @@
+from os import name
 from django.db.models.fields import TimeField
 from django.shortcuts import render
 from django.core.paginator import Paginator
@@ -43,6 +44,8 @@ def events_view(request):
         names = list()
         for event in qs:
             names.append(event.name)
+        names = list(dict.fromkeys(names))
+        names.sort()
         return JsonResponse(names, safe=False)
 
     qsname = ""
