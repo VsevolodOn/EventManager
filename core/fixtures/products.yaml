@@ -1,4 +1,4 @@
-- model: shop.TypeEvent
+- model: core.TypeEvent
   pk: 1
   fields:
     name: Тип 1
