@@ -7,10 +7,10 @@
   fields:
     name: Тип 2
 
-- model: auth.Groups
+- model: auth.Group
   pk: 1
   fields:
-    Name: allow_group  
+    name: allow_group  
 
 - model: core.TypeVisitor
   pk: 1
