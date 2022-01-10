@@ -71,13 +71,13 @@ class AnalysisEvent():
 
     def get_max_time(self) -> datetime:
         if self.count > 0:
-            return self.visitors.aggregate(Max('arrivalDate'))
+            return self.visitors.aggregate(Max('arrivalDate'))['arrivalDate__max']
         else:
             return None
 
     def get_min_time(self) -> datetime:
         if self.count > 0:
-            return self.visitors.aggregate(Min('arrivalDate'))
+            return self.visitors.aggregate(Min('arrivalDate'))['arrivalDate__min']
         else:
             return None
 

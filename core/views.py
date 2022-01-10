@@ -28,6 +28,10 @@ from django.conf import settings
 from .analyzer import AnalysisEvent
 
 
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+
 def events_view(request):
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse("login"))
@@ -263,9 +267,24 @@ def login_view(request):
             context['mes'] = 'Данные отправлены. Ожидайте подтверждения администратором.'
         return render(request, template, context)
 
+# Отправка уведомления администратору
+
+
+@receiver(post_save, sender=User)
+def my_handler(sender, **kwargs):
+    if kwargs['created']:
+        send_mail(subject='Новый пользователь. Требуется подтверждение.',
+                  message='Login: ' +
+                  kwargs['instance'].username +
+                  ';\nEmail: ' +
+                  kwargs['instance'].email +
+                  ';\nName: ' +
+                  kwargs['instance'].first_name+'.',
+                  from_email=settings.EMAIL_HOST_USER,
+                  recipient_list=[settings.RECIPIENT_ADDRESS])
+
+
 # Регистрация
-
-
 def signup_view(request):
     if request.user.is_authenticated:
         return HttpResponseRedirect(reverse("events"))
@@ -281,18 +300,13 @@ def signup_view(request):
             if password1 == password2:
                 if User.objects.all().filter(username=username):
                     auth_form.add_error(
-                        '__all__', 'Пользователь с данным именем уже существует!')
+                        '__all__', 'Пользователь с данным логином уже существует!')
                 else:
                     user = User.objects.create_user(
                         username=username, password=password1, first_name=name, email=email)
                     new_group = Group.objects.get(name='allow_group')
                     user.groups.add(new_group)
                     user.save()
-
-                    send_mail(subject='New user',
-                              message='User: ' + username+';\nEmail: '+email+';\nName: '+name+';',
-                              from_email=settings.EMAIL_HOST_USER,
-                              recipient_list=[settings.RECIPIENT_ADDRESS])
                     return redirect('%s?mes=1' % reverse('login'))
 
             else:
@@ -326,63 +340,3 @@ def personal_view(request):
         'user': request.user
     }
     return render(request, template, context)
-
-
-def help_view(request):
-    event = Event()
-    event.name = "Мероприятие 1"
-    event.address = "Адрес 1"
-    event.type = TypeEvent.objects.all()[0]
-    event.description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-    event.save()
-
-    event = Event()
-    event.name = "Мероприятие 1"
-    event.address = "Адрес 1"
-    event.type = TypeEvent.objects.all()[0]
-    event.description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-    event.save()
-
-    event = Event()
-    event.name = "Мероприятие 1"
-    event.address = "Адрес 1"
-    event.type = TypeEvent.objects.all()[0]
-    event.description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-    event.save()
-
-    event = Event()
-    event.name = "Мероприятие 1"
-    event.address = "Адрес 1"
-    event.type = TypeEvent.objects.all()[0]
-    event.description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-    event.save()
-
-    event = Event()
-    event.name = "Мероприятие 1"
-    event.address = "Адрес 1"
-    event.type = TypeEvent.objects.all()[0]
-    event.description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-    event.save()
-
-    event = Event()
-    event.name = "Мероприятие 1"
-    event.address = "Адрес 1"
-    event.type = TypeEvent.objects.all()[0]
-    event.description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-    event.save()
-
-    event = Event()
-    event.name = "Мероприятие 1"
-    event.address = "Адрес 1"
-    event.type = TypeEvent.objects.all()[0]
-    event.description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-    event.save()
-
-    event = Event()
-    event.name = "Мероприятие 1"
-    event.address = "Адрес 1"
-    event.type = TypeEvent.objects.all()[0]
-    event.description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-    event.save()
-
-    return redirect(reverse('events'))

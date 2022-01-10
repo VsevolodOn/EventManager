@@ -16,6 +16,4 @@ urlpatterns = [
     path('event-delete-<int:id>', views.event_delete, name="event_delete"),
     path('visitor-delete-<int:id>', views.visitor_delete, name="visitor_delete"),
 
-    path('help', views.help_view, name="help"),
-
 ]

@@ -1,0 +1,78 @@
+- model: core.TypeEvent
+  pk: 1
+  fields:
+    name: Тип 1
+- model: core.TypeEvent
+  pk: 2
+  fields:
+    name: Тип 2
+
+- model: core.TypeVisitor
+  pk: 1
+  fields:
+    name: Тип 1
+- model: core.TypeVisitor
+  pk: 2
+  fields:
+    name: Тип 2
+- model: core.TypeVisitor
+  pk: 3
+  fields:
+    name: Тип 3
+
+- model: core.Event
+  pk: 1
+  fields:
+    name: Мероприятие 1
+    address: Адрес 1
+    type: 1
+    description: lorem ipsu
+- model: core.Visitor
+  pk: 1
+  fields:
+    event: 1
+    arrivalDate: "2021-10-01 17:00:00"
+    fullName: Всеволод 1
+    type: 1
+- model: core.Visitor
+  pk: 2
+  fields:
+    event: 1
+    arrivalDate: "2021-10-01 17:07:00"
+    fullName: Всеволод 2
+    type: 1
+- model: core.Visitor
+  pk: 3
+  fields:
+    event: 1
+    arrivalDate: "2021-10-01 17:10:00"
+    fullName: Всеволод 3
+    type: 1
+- model: core.Visitor
+  pk: 4
+  fields:
+    event: 1
+    arrivalDate: "2021-10-01 17:11:00"
+    fullName: Всеволод 4
+    type: 2
+- model: core.Visitor
+  pk: 5
+  fields:
+    event: 1
+    arrivalDate: "2021-10-01 17:31:00"
+    fullName: Всеволод 5
+    type: 2
+- model: core.Visitor
+  pk: 6
+  fields:
+    event: 1
+    arrivalDate: "2021-10-01 17:40:00"
+    fullName: Всеволод 6
+    type: 3
+- model: core.Visitor
+  pk: 7
+  fields:
+    event: 1
+    arrivalDate: "2021-10-01 17:51:00"
+    fullName: Всеволод 7
+    type: 3
