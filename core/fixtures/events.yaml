@@ -7,7 +7,7 @@
   fields:
     name: Тип 2
 
- - model: auth.Groups
+- model: auth.Groups
   pk: 1
   fields:
     Name: allow_group  
