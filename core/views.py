@@ -26,7 +26,8 @@ from django.contrib.auth.models import Group
 
 from django.core.mail import send_mail
 from django.conf import settings
-from .analyzer import AnalysisEvent
+from .analyzer import AnalyzerEvent
+from .analyzer import AnalyzerEvents
 
 
 from django.db.models.signals import post_save
@@ -89,6 +90,8 @@ def events_view(request):
         maxp = page_obj.number+2
 
     form = EventForm()
+    analys = AnalyzerEvents().get_analysis()
+
     template = "core/events.html"
     context = {
         'events': page_obj,
@@ -98,6 +101,10 @@ def events_view(request):
         'mina': page_obj.paginator.page_range[0],
         'maxa': page_obj.paginator.page_range[-1],
         'form': form,
+        'acount': analys['num_visitors'],
+        'vcounts': analys['num_visitors_by_type'],
+        'levent': analys['last_event'],
+        'mevent': analys['maxv_event']
     }
     return render(request, template, context)
 
@@ -170,7 +177,7 @@ def event_view(request, id):
     if maxp-page_obj.number > 2:
         maxp = page_obj.number+2
 
-    analys = AnalysisEvent(event.id)
+    analys = AnalyzerEvent().get_analysis(event.id)
     context = {
         'event': event,
         'eform': eform,
@@ -181,14 +188,14 @@ def event_view(request, id):
         'maxp': maxp,
         'mina': page_obj.paginator.page_range[0],
         'maxa': page_obj.paginator.page_range[-1],
-        'acount': analys.get_num_visitors(),
-        'vcounts': analys.get_num_visitors_by_type(),
-        'meandata': analys.get_mean_time(),
-        'maxdata': analys.get_max_time(),
-        'mindata': analys.get_min_time(),
-        'mediandata': analys.get_median_time(),
-        'q1data': analys.get_q1_time(),
-        'q3data': analys.get_q3_time()
+        'acount': analys['num_visitors'],
+        'vcounts': analys['num_visitors_by_type'],
+        'meandata': analys['mean_time'],
+        'maxdata': analys['max_time'],
+        'mindata': analys['min_time'],
+        'mediandata': analys['median_time'],
+        'q1data': analys['q1_time'],
+        'q3data': analys['q3_time']
     }
 
     return render(request, template, context)

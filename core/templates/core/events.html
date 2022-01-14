@@ -211,6 +211,58 @@
         </div>
     </form>
 
+{% if events %}
+    <!-- Аналитика -->
+<div class="container mt-3">
+    <div class="card">
+        <div id="dataprog" class="card-header ">
+          <div>
+            Аналитика
+          </div>
+          </div>
+        <div class="card-body ">
+            <div class="container">
+              <ul class="list-unstyled">
+                <li>
+                    <p class="card-text mb-auto">
+                    <span class="font-weight-bold">Всего участников:</span> 
+                    {{acount}}</p>
+                </li>
+                    {% if acount != 0 %}
+                    <li>
+                      <p class="card-text mb-auto">
+                        <span class="font-weight-bold">Число участников по типу:</span>
+                      </p>
+                    </li>
+                      <ul>
+                      {% for vcount in vcounts %}
+                        <li><p class="card-text mb-auto">
+                          <span class="font-weight-bold">{{vcount.type__name}}:</span> {{vcount.dcount}}
+                        </p></li>
+                      {% endfor %}
+                      </ul>
+
+                    <li>
+                      <p class="card-text mb-auto">
+                      <span class="font-weight-bold">Самое посещаемое мероприятие:</span> 
+                      {{mevent.name}}, {{mevent.startDate | date:'d.m.Y H:i:s'}}</p>
+                    </li>
+                    {% endif %}
+                    <li>
+                      <p class="card-text mb-auto">
+                      <span class="font-weight-bold">Последнее мероприятие:</span> 
+                      {{levent.name}}, {{levent.startDate | date:'d.m.Y H:i:s'}}</p>
+                    </li>
+
+                    
+                    
+                
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
 <script>
   $( function() {
     $( "#events" ).autocomplete({

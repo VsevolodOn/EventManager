@@ -21,7 +21,7 @@ from django.contrib.auth import authenticate, logout
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
-from core.analyzer import AnalysisEvent
+from core.analyzer import AnalyzerEvent
 
 
 @csrf_exempt
@@ -98,7 +98,7 @@ class AnalysisView(APIView):
 
     def get(self, request, pk):
         get_object_or_404(Event.objects.all(), pk=pk)
-        analys = AnalysisEvent(pk)
+        analys = AnalyzerEvent(pk)
         return Response({"acount": analys.get_num_visitors(),
                          "vcounts": analys.get_num_visitors_by_type(),
                          "meandata": analys.get_mean_time(),
