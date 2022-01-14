@@ -3,6 +3,7 @@ django-crispy-forms==1.13.0
 djangorestframework==3.12.4
 django-mathfilters
 django-environ
+django-extensions
 
 django
 psycopg2
