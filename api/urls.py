@@ -8,7 +8,9 @@ urlpatterns = [
     path('login', views.login),
     path('user', views.UserView.as_view()),
     path('user-update/<int:pk>', views.UserUpdateView.as_view()),
+    path('analysis', views.AnalyzesView.as_view()),
     path('analysis/<int:pk>', views.AnalysisView.as_view()),
+
 
     path('event', views.EventListCreate.as_view()),
     path('event/<int:pk>', views.EventRetrieveUpdateDestroy.as_view()),

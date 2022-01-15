@@ -22,7 +22,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from core.analyzer import AnalyzerEvent
-
+from core.analyzer import AnalyzerEvents
 
 @csrf_exempt
 def signup(request):
@@ -98,15 +98,41 @@ class AnalysisView(APIView):
 
     def get(self, request, pk):
         get_object_or_404(Event.objects.all(), pk=pk)
-        analys = AnalyzerEvent(pk)
-        return Response({"acount": analys.get_num_visitors(),
-                         "vcounts": analys.get_num_visitors_by_type(),
-                         "meandata": analys.get_mean_time(),
-                         "maxdata": analys.get_max_time(),
-                         "mindata": analys.get_min_time(),
-                         "mediandata": analys.get_median_time(),
-                         "q1data": analys.get_q1_time(),
-                         "q3data": analys.get_q3_time()})
+        analys = AnalyzerEvent().get_analysis(pk)
+        return Response({'acount': analys['num_visitors'],
+                         'vcounts': analys['num_visitors_by_type'],
+                         'meandata': analys['mean_time'],
+                         'maxdata': analys['max_time'],
+                         'mindata': analys['min_time'],
+                         'mediandata': analys['median_time'],
+                         'q1data': analys['q1_time'],
+                         'q3data': analys['q3_time']})
+
+
+class AnalysisView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, pk):
+        get_object_or_404(Event.objects.all(), pk=pk)
+        analys = AnalyzerEvent().get_analysis(pk)
+        return Response({'acount': analys['num_visitors'],
+                         'vcounts': analys['num_visitors_by_type'],
+                         'meandata': analys['mean_time'],
+                         'maxdata': analys['max_time'],
+                         'mindata': analys['min_time'],
+                         'mediandata': analys['median_time'],
+                         'q1data': analys['q1_time'],
+                         'q3data': analys['q3_time']})
+
+
+class AnalyzesView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    def get(self, request):
+        analys = AnalyzerEvents().get_analysis()        
+        return Response({'acount': analys['num_visitors'],
+                         'vcounts': analys['num_visitors_by_type'],
+                         'levent': analys['last_event'],
+                         'mevent': analys['maxv_event']})
 
 
 class EventListCreate(generics.ListCreateAPIView):

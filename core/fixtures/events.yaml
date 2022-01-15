@@ -30,8 +30,19 @@
   fields:
     name: Мероприятие 1
     address: Адрес 1
+    startDate: "2021-10-01 17:00:00"
     type: 1
     description: lorem ipsu
+
+- model: core.Event
+  pk: 2
+  fields:
+    name: Мероприятие 2
+    address: Адрес 1
+    startDate: "2021-10-03 17:00:00"
+    type: 2
+    description: lorem ipsu
+
 - model: core.Visitor
   pk: 1
   fields:

@@ -35,7 +35,6 @@ class Event(models.Model):
         ordering = ('-startDate',)
 
 
-# Изображения протокола
 class Visitor(models.Model):
     event = models.ForeignKey(
         Event, on_delete=models.CASCADE, verbose_name='performance')

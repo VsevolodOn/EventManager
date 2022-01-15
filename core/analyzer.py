@@ -57,21 +57,15 @@ class Analysis(ABC):
 class AnalysisEvents(Analysis):
     def set_resource(self):
         self.resource['visitors'] = Visitor.objects.all()
-        self.resource['events'] = Event.objects.all()
 
     def calc_data(self):
         self.data['num_visitors'] = self.resource['visitors'].count()
         self.data['num_visitors_by_type'] = self.resource['visitors'].values(
             'type__name').annotate(dcount=Count('type'))
-
-        self.data['last_event'] = self.resource['events'].first()
-        query_result = self.resource['visitors'].values(
-            'event__id').annotate(dcount=Count('event'))
-        if query_result:
-            maxval = max(query_result, key=lambda x: x['dcount'])
-            self.data['maxv_event'] = Event.objects.get(id=maxval['event__id'])
-        else:
-            self.data['maxv_event'] = None
+        self.data['last_event'] = EventContext(
+            EventStrategyLast()).make_strategy()
+        self.data['maxv_event'] = EventContext(
+            EventStrategyMax()).make_strategy()
 
 
 class AnalysisEvent(Analysis):
@@ -81,8 +75,8 @@ class AnalysisEvent(Analysis):
 
     def calc_data(self):
         self.data['num_visitors'] = self.resource['visitors'].count()
-        self.data['num_visitors_by_type'] = self.resource['visitors'].values(
-            'type__name').annotate(dcount=Count('type'))
+        self.data['num_visitors_by_type'] = list(self.resource['visitors'].values(
+            'type__name').annotate(dcount=Count('type')))
         self.data['mean_time'] = TimeContext(
             TimeStrategyMean(), self.resource['visitors']).make_strategy()
         self.data['max_time'] = TimeContext(
@@ -148,6 +142,7 @@ class TimeStrategyQ1(TimeStrategy):
         if visitors.count() > 0:
             q1data = visitors.aggregate(q1_difference=Q1(
                 F('arrivalDate')-datetime(1970, 1, 1)))['q1_difference']
+
             return datetime(1970, 1, 1)+q1data
         else:
             return None
@@ -195,5 +190,43 @@ class TimeContext():
         self.strategy = strategy
         self.visitors = visitors
 
+    def strategy(self, strategy: TimeStrategy) -> None:
+        self.strategy = strategy
+
     def make_strategy(self) -> datetime:
         return self.strategy.do_algorithm(self.visitors)
+
+
+class EventStrategy(ABC):
+    @abstractmethod
+    def do_algorithm(self, visitors: QuerySet):
+        pass
+
+
+class EventStrategyLast(TimeStrategy):
+    def do_algorithm(self) -> Dict:
+        event = Event.objects.all().first()
+        return {'id': event.id, 'name': event.name, 'startDate': event.startDate}
+
+
+class EventStrategyMax(TimeStrategy):
+    def do_algorithm(self) -> Dict:
+        query_result = Visitor.objects.all().values(
+            'event__id').annotate(dcount=Count('event'))
+        if query_result:
+            maxval = max(query_result, key=lambda x: x['dcount'])
+            event = Event.objects.get(id=maxval['event__id'])
+            return {'id': event.id, 'name': event.name, 'startDate': event.startDate}
+        else:
+            return None
+
+
+class EventContext():
+    def __init__(self, strategy: EventStrategy) -> None:
+        self.strategy = strategy
+
+    def strategy(self, strategy: EventStrategy) -> None:
+        self.strategy = strategy
+
+    def make_strategy(self) -> Dict:
+        return self.strategy.do_algorithm()
